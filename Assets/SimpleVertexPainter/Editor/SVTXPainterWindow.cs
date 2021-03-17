@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -11,6 +11,9 @@ namespace SVTXPainterEditor
         #region Variables
         private GUIStyle titleStyle;
         private bool allowPainting = false;
+        private bool shaderChanged = false;
+        private Color[] save_colors = null;
+        private Material[] save_materials = null;
         private bool changingBrushValue = false;
         private bool allowSelect = false;
         private bool isPainting = false;
@@ -63,6 +66,11 @@ namespace SVTXPainterEditor
 
         private void OnDestroy()
         {
+            if (save_materials != null)
+            {
+                Selection.activeGameObject.GetComponent<Renderer>().sharedMaterials = save_materials;
+                save_materials = null;
+            }
             SceneView.duringSceneGui -= this.OnSceneGUI;
         }
 
@@ -108,13 +116,44 @@ namespace SVTXPainterEditor
                 }
                 else
                 {
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("Backup Color Map"))
+                    {
+                        curMesh = SVTXPainterUtils.GetMesh(m_active);
+                        save_colors = curMesh.colors;
+                    }
+                    if (GUILayout.Button("Restore Color Map"))
+                    {
+                        curMesh = SVTXPainterUtils.GetMesh(m_active);
+                        curMesh.colors = save_colors;
+                    }
+                    GUILayout.EndHorizontal();
                     //bool lastAP = allowPainting;
                     allowPainting = GUILayout.Toggle(allowPainting, "Paint Mode");
 
                     if (allowPainting)
                     {
+                        if (!shaderChanged)
+                        {
+                            save_materials = Selection.activeGameObject.GetComponent<Renderer>().sharedMaterials;
+                            Material svtxMaterial = new Material(Shader.Find("SVTX/Vertex Color"));
+                            Material[] svtxMaterials = new Material[save_materials.Length];
+                            for (int i = 0; i < svtxMaterials.Length; i++)
+                            {
+                                svtxMaterials[i] = svtxMaterial;
+                            }
+                            Selection.activeGameObject.GetComponent<Renderer>().sharedMaterials = svtxMaterials;
+                            shaderChanged = true;
+                        }
                         //Selection.activeGameObject = null;
                         Tools.current = Tool.None;
+                    } else
+                    {
+                        if (shaderChanged)
+                        {
+                            Selection.activeGameObject.GetComponent<Renderer>().sharedMaterials = save_materials;
+                            shaderChanged = false;
+                        }
                     }
 
 
