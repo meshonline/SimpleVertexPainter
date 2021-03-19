@@ -56,8 +56,8 @@ namespace SVTXPainterEditor
 
         private void OnEnable()
         {
-            SceneView.duringSceneGui -= this.OnSceneGUI;
-            SceneView.duringSceneGui += this.OnSceneGUI;
+            SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+            SceneView.onSceneGUIDelegate += this.OnSceneGUI;
             if (titleStyle == null)
             {
                 GenerateStyles();
@@ -71,7 +71,7 @@ namespace SVTXPainterEditor
                 Selection.activeGameObject.GetComponent<Renderer>().sharedMaterials = save_materials;
                 save_materials = null;
             }
-            SceneView.duringSceneGui -= this.OnSceneGUI;
+            SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
         }
 
         private void OnSelectionChange()
