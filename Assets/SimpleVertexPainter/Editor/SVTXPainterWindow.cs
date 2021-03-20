@@ -56,8 +56,13 @@ namespace SVTXPainterEditor
 
         private void OnEnable()
         {
+#if UNITY_2019_1_OR_NEWER
+            SceneView.duringSceneGui -= this.OnSceneGUI;
+            SceneView.duringSceneGui += this.OnSceneGUI;
+#else
             SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
             SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+#endif
             if (titleStyle == null)
             {
                 GenerateStyles();
@@ -71,7 +76,11 @@ namespace SVTXPainterEditor
                 Selection.activeGameObject.GetComponent<Renderer>().sharedMaterials = save_materials;
                 save_materials = null;
             }
+#if UNITY_2019_1_OR_NEWER
+            SceneView.duringSceneGui -= this.OnSceneGUI;
+#else
             SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+#endif
         }
 
         private void OnSelectionChange()
@@ -95,9 +104,9 @@ namespace SVTXPainterEditor
             Repaint();
         }
 
-        #endregion
+#endregion
 
-        #region GUI Methods
+#region GUI Methods
         private void OnGUI()
         {
             //Header
@@ -273,9 +282,9 @@ namespace SVTXPainterEditor
         {
             OnSelectionChange();
         }
-        #endregion
+#endregion
 
-        #region TempPainter Method
+#region TempPainter Method
         void PaintVertexColor()
         {
             if (m_target&&m_active)
@@ -367,9 +376,9 @@ namespace SVTXPainterEditor
                 Debug.LogWarning("Nothing to fill!");
             }
         }
-        #endregion
+#endregion
 
-        #region Utility Methods
+#region Utility Methods
         void ProcessInputs()
         {
             if (m_target == null)
@@ -479,7 +488,7 @@ namespace SVTXPainterEditor
             }
             return Color.white;
         }
-        #endregion
+#endregion
 
     }
 
