@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -35,6 +35,23 @@ namespace SVTXPainter
                 }
             }
             return curMesh;
+        }
+
+        public static Mesh GetBakedSkinnedMesh(GameObject aGO)
+        {
+            Mesh bakedSkinnedMesh = null;
+            if (aGO)
+            {
+                MeshFilter curFilter = aGO.GetComponent<MeshFilter>();
+                SkinnedMeshRenderer curSkinnned = aGO.GetComponent<SkinnedMeshRenderer>();
+
+                if (!curFilter && curSkinnned)
+                {
+                    bakedSkinnedMesh = new Mesh();
+                    curSkinnned.BakeMesh(bakedSkinnedMesh);
+                }
+            }
+            return bakedSkinnedMesh;
         }
 
         //Falloff 
