@@ -38,6 +38,7 @@ namespace SVTXPainterEditor
         private int curColorChannel = (int)PaintType.All;
 
         private Mesh curMesh;
+        private Mesh bakedSkinnedMesh;
         private SVTXObject m_target;
         private GameObject m_active;
 
@@ -88,10 +89,12 @@ namespace SVTXPainterEditor
             m_target = null;
             m_active = null;
             curMesh = null;
+            bakedSkinnedMesh = null;
             if (Selection.activeGameObject != null)
             {
                 m_target = Selection.activeGameObject.GetComponent<SVTXObject>();
                 curMesh = SVTXPainterUtils.GetMesh(Selection.activeGameObject);
+                bakedSkinnedMesh = SVTXPainterUtils.GetBakedSkinnedMesh(Selection.activeGameObject);
 
                 var activeGameObject = Selection.activeGameObject;
                 if (curMesh != null)
@@ -245,7 +248,7 @@ namespace SVTXPainterEditor
                 {
                     Matrix4x4 mtx = m_target.transform.localToWorldMatrix;
                     RaycastHit tempHit;
-                    isHit = RXLookingGlass.IntersectRayMesh(worldRay, curMesh, mtx, out tempHit);
+                    isHit = RXLookingGlass.IntersectRayMesh(worldRay, bakedSkinnedMesh ? bakedSkinnedMesh : curMesh, mtx, out tempHit);
                     if (isHit)
                     {
                         if (!changingBrushValue)
@@ -297,7 +300,7 @@ namespace SVTXPainterEditor
                         m_target.PushUndo();
                         isRecord = false;
                     }
-                    Vector3[] verts = curMesh.vertices;
+                    Vector3[] verts = bakedSkinnedMesh ? bakedSkinnedMesh.vertices : curMesh.vertices;
                     Color[] colors = new Color[0];
                     if (curMesh.colors.Length > 0)
                     {
